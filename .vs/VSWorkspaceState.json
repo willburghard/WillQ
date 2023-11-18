@@ -1,7 +1,10 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\Builds",
+    "\\Builds\\VisualStudio2022",
+    "\\Source"
   ],
-  "SelectedNode": "\\SimpleEQ.sln",
+  "SelectedNode": "\\Builds\\VisualStudio2022\\SimpleEQ.sln",
   "PreviewInSolutionExplorer": true
 }
