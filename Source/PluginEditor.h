@@ -32,6 +32,13 @@ struct RotarySliderWithLabels : juce::Slider
         setLookAndFeel(nullptr);
     }
 
+    struct LabelPos {
+        float pos;
+        std::string label;
+    };
+
+    juce::Array<LabelPos> labels;
+
     void paint(juce::Graphics& g) override;
     juce::Rectangle<int> getSliderBounds() const;
     int getTextHeight() const { return 14; }
@@ -61,6 +68,8 @@ private:
     juce::Atomic<bool> parametersChanged{ false };
 
     MonoChain monoChain;
+
+    void updateChain();
 
 };
 //==============================================================================
