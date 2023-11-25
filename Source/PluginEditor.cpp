@@ -66,10 +66,6 @@ void RotarySliderWithLabels::paint(juce::Graphics& g) {
 
     auto sliderBounds = getSliderBounds();
 
-  /*  g.setColour(Colours::red);
-    g.drawRect(getLocalBounds());
-    g.setColour(Colours::yellow);
-    g.drawRect(sliderBounds);*/
 
     getLookAndFeel().drawRotarySlider(g,
         sliderBounds.getX(),
@@ -119,7 +115,6 @@ juce::Rectangle<int> RotarySliderWithLabels::getSliderBounds() const {
     r.setCentre(bounds.getCentreX(), 0);
     r.setY(2);
     return r;
-   // return getLocalBounds();
 }
 
 juce::String RotarySliderWithLabels::getDisplayString() const
@@ -293,7 +288,6 @@ void ResponseCurveComponent::resized() {
     }
     g.setColour(Colours::dimgrey);
     for (auto x : xs) {
-      //  auto normX = mapFromLog10(f, 20.f, 20000.f);
         g.drawVerticalLine(x, top, bottom);
     }
     Array<float> gain{
@@ -303,10 +297,8 @@ void ResponseCurveComponent::resized() {
         auto y = jmap(gDb, -24.f, 24.f, float(bottom), float(top));
         g.setColour(gDb == 0.f ? Colour(0u, 172u, 1u) : Colours::darkgrey);
         g.drawHorizontalLine(y, left, right);
-  //      g.drawHorizontalLine(y, 0, getWidth());
     }
 
- //   g.drawRect(getRenderArea());
     g.setColour(Colours::lightgrey);
     const int fontHeight = 10;
     g.setFont(fontHeight);
@@ -351,6 +343,15 @@ void ResponseCurveComponent::resized() {
 
         g.setColour(gDb == 0.f ? Colour(0u, 172u, 1u) : Colours::lightgrey);
         g.drawFittedText(str, r, juce::Justification::centred, 1);
+
+        str.clear();
+        str << (gDb - 24.f);
+        r.setX(1);
+        textWidth = g.getCurrentFont().getStringWidth(str);
+        r.setSize(textWidth, fontHeight);
+        g.setColour(Colours::lightgrey);
+        g.drawFittedText(str, r, juce::Justification::centred, 1);
+
     }
 }
 
