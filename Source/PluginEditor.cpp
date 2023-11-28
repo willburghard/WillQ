@@ -267,11 +267,13 @@ void ResponseCurveComponent::timerCallback() {
     /* While there are paths that can be pulled,
         pull as many as we can,
         display most recent */
-    auto fftBounds = getAnalysisArea().toFloat();
-    auto sampleRate = audioProcessor.getSampleRate();
+    if (shouldShowFFTAnalysis) {
+        auto fftBounds = getAnalysisArea().toFloat();
+        auto sampleRate = audioProcessor.getSampleRate();
 
-    leftPathProducer.process(fftBounds, sampleRate);
-    rightPathProducer.process(fftBounds, sampleRate);
+        leftPathProducer.process(fftBounds, sampleRate);
+        rightPathProducer.process(fftBounds, sampleRate);
+    }
 
     if (parametersChanged.compareAndSetBool(false, true))
     {
@@ -372,15 +374,17 @@ void ResponseCurveComponent::paint(juce::Graphics& g)
     {
         responseCurve.lineTo(responseArea.getX() + i, map(mags[i]));
     }
-    auto leftChannelFFTPath = leftPathProducer.getPath();
-    leftChannelFFTPath.applyTransform(AffineTransform().translation(responseArea.getX(), responseArea.getY()));
-    g.setColour(Colours::skyblue);
-    g.strokePath(leftChannelFFTPath, PathStrokeType(1));
+    if (shouldShowFFTAnalysis) {
+        auto leftChannelFFTPath = leftPathProducer.getPath();
+        leftChannelFFTPath.applyTransform(AffineTransform().translation(responseArea.getX(), responseArea.getY()));
+        g.setColour(Colours::skyblue);
+        g.strokePath(leftChannelFFTPath, PathStrokeType(1));
 
-    auto rightChannelFFTPath = rightPathProducer.getPath();
-    rightChannelFFTPath.applyTransform(AffineTransform().translation(responseArea.getX(), responseArea.getY()));
-    g.setColour(Colours::yellow);
-    g.strokePath(rightChannelFFTPath, PathStrokeType(1));
+        auto rightChannelFFTPath = rightPathProducer.getPath();
+        rightChannelFFTPath.applyTransform(AffineTransform().translation(responseArea.getX(), responseArea.getY()));
+        g.setColour(Colours::yellow);
+        g.strokePath(rightChannelFFTPath, PathStrokeType(1));
+    }
 
     g.setColour(Colours::orange);
     g.drawRoundedRectangle(getRenderArea().toFloat(), 4.f, 1.f);
@@ -584,6 +588,14 @@ SimpleEQAudioProcessorEditor::SimpleEQAudioProcessorEditor (SimpleEQAudioProcess
 
                 comp->highCutFreqSlider.setEnabled(!bypassed);
                 comp->highCutSlopeSlider.setEnabled(!bypassed);
+            }
+        };
+    analyzerEnabledButton.onClick = [safePtr]()
+        {
+            if (auto* comp = safePtr.getComponent()) {
+                auto enabled = comp->analyzerEnabledButton.getToggleState();
+                comp->responseCurveComponent.toggleAnalysisEnablement(enabled);
+
             }
         };
     setSize (600, 450);
