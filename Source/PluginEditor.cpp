@@ -19,7 +19,7 @@ void LookAndFeel::drawRotarySlider(juce::Graphics& g,
 
     auto bounds = juce::Rectangle<float>(x, y, width, height);
     auto enabled = slider.isEnabled();
-    g.setColour(enabled ? Colour(97u, 18u, 167u) : Colours::darkgrey);
+    g.setColour(enabled ? Colours::darkolivegreen : Colours::darkgrey);
     g.fillEllipse(bounds);
 
     g.setColour(enabled ? Colour(255u, 154u, 1u) : Colours::grey);
@@ -49,10 +49,10 @@ void LookAndFeel::drawRotarySlider(juce::Graphics& g,
         r.setSize(strWidth + 4, rswl->getTextHeight() + 2);
         r.setCentre(center);
 
-        g.setColour(Colours::black);
+        g.setColour(enabled ? Colours::black : Colours::darkgrey);
         g.fillRect(r);
         
-        g.setColour(Colours::white);
+        g.setColour(enabled ? Colours::white : Colours::lightgrey);
         g.drawFittedText(text, r.toNearestInt(), juce::Justification::centred, 1);
     }
 }
@@ -98,13 +98,6 @@ void LookAndFeel::drawToggleButton(juce::Graphics& g,
         g.setColour(color);
         auto bounds = toggleButton.getLocalBounds();
         g.drawRect(bounds);
-       // auto insetRect = bounds.reduced(4);
-      //  Path randomPath;
-       /* Random r;
-        randomPath.startNewSubPath(insetRect.getX(), insetRect.getY() + insetRect.getHeight() * r.nextFloat());
-        for (auto x = insetRect.getX() + 1; x < insetRect.getRight(); x += 2) {
-            randomPath.lineTo(x, insetRect.getY() + insetRect.getHeight() * r.nextFloat());
-        }*/
         g.strokePath(analyzerButton->randomPath, PathStrokeType(1.f));
     }
 
@@ -196,7 +189,25 @@ juce::String RotarySliderWithLabels::getDisplayString() const
     }
     return str;
 }
-ResponseCurveComponent::ResponseCurveComponent(SimpleEQAudioProcessor& p) : audioProcessor(p),
+
+TitleComponent::TitleComponent(juce::String& title)  {
+    title = title;
+}
+
+void TitleComponent::paint(juce::Graphics& g) {
+    using namespace juce;
+    g.setColour(Colours::black);
+    Rectangle<int> r = getLocalBounds().toNearestInt();
+    r.setX(10);
+    juce::String str = "WILLQ";
+    auto fontHeight = 41;
+    juce::String typeface = "Times New Roman";
+    Font f(typeface, "bold", 30);
+    g.setFont(f);
+    g.drawFittedText(str, r, juce::Justification::left, 1);
+}
+
+ResponseCurveComponent::ResponseCurveComponent(WillQAudioProcessor& p) : audioProcessor(p),
     leftPathProducer(audioProcessor.leftChannelFifo),
 rightPathProducer(audioProcessor.rightChannelFifo){
     const auto& params = audioProcessor.getParameters();
@@ -305,7 +316,7 @@ void ResponseCurveComponent::paint(juce::Graphics& g)
 {
     using namespace juce;
     // (Our component is opaque, so we must completely fill the background with a solid colour)
-    g.fillAll(Colours::black);
+    g.fillAll(Colours::antiquewhite);
 
     g.drawImage(background, getLocalBounds().toFloat());
 
@@ -398,6 +409,7 @@ void ResponseCurveComponent::resized() {
     background = Image(Image::PixelFormat::RGB, getWidth(), getHeight(), true);
 
     Graphics g(background);
+
 
     Array<float> freqs
     {
@@ -506,8 +518,8 @@ juce::Rectangle<int> ResponseCurveComponent::getAnalysisArea() {
 }
 
 //==============================================================================
-SimpleEQAudioProcessorEditor::SimpleEQAudioProcessorEditor (SimpleEQAudioProcessor& p)
-    : AudioProcessorEditor (&p), audioProcessor (p),
+WillQAudioProcessorEditor::WillQAudioProcessorEditor(WillQAudioProcessor& p)
+    : AudioProcessorEditor(&p), audioProcessor(p),
     peakFreqSlider(*audioProcessor.apvts.getParameter("Peak Freq"), "Hz"),
     peakGainSlider(*audioProcessor.apvts.getParameter("Peak Gain"), "dB"),
     peakQualitySlider(*audioProcessor.apvts.getParameter("Peak Quality"), ""),
@@ -526,7 +538,8 @@ SimpleEQAudioProcessorEditor::SimpleEQAudioProcessorEditor (SimpleEQAudioProcess
     lowcutBypassButtonAttachment(audioProcessor.apvts, "LowCut Bypass", lowcutBypassButton),
     highcutBypassButtonAttachment(audioProcessor.apvts, "HighCut Bypass", highcutBypassButton),
     peakBypassButtonAttachment(audioProcessor.apvts, "Peak Bypass", peakBypassButton),
-    analyzerEnabledButtonAttachment(audioProcessor.apvts, "Analyzer Enabled", analyzerEnabledButton)
+    analyzerEnabledButtonAttachment(audioProcessor.apvts, "Analyzer Enabled", analyzerEnabledButton),
+    titleComponent(pluginTitle)
 
 {
     peakFreqSlider.labels.add({ 0.f, "20hz" });
@@ -561,7 +574,7 @@ SimpleEQAudioProcessorEditor::SimpleEQAudioProcessorEditor (SimpleEQAudioProcess
     highcutBypassButton.setLookAndFeel(&lnf);
     analyzerEnabledButton.setLookAndFeel(&lnf);
 
-    auto safePtr = juce::Component::SafePointer<SimpleEQAudioProcessorEditor>(this);
+    auto safePtr = juce::Component::SafePointer<WillQAudioProcessorEditor>(this);
     peakBypassButton.onClick = [safePtr]()
         {
             if (auto* comp = safePtr.getComponent()) {
@@ -601,7 +614,7 @@ SimpleEQAudioProcessorEditor::SimpleEQAudioProcessorEditor (SimpleEQAudioProcess
     setSize (600, 450);
 }
 
-SimpleEQAudioProcessorEditor::~SimpleEQAudioProcessorEditor()
+WillQAudioProcessorEditor::~WillQAudioProcessorEditor()
 {
     peakBypassButton.setLookAndFeel(nullptr);
     lowcutBypassButton.setLookAndFeel(nullptr);
@@ -610,28 +623,35 @@ SimpleEQAudioProcessorEditor::~SimpleEQAudioProcessorEditor()
 }
 
 //==============================================================================
-void SimpleEQAudioProcessorEditor::paint(juce::Graphics& g)
+void WillQAudioProcessorEditor::paint(juce::Graphics& g)
 {
     using namespace juce;
     // (Our component is opaque, so we must completely fill the background with a solid colour)
-    g.fillAll(Colours::black);
-
-    
+    g.fillAll(Colours::antiquewhite);
 
   
 }
 
-void SimpleEQAudioProcessorEditor::resized()
+
+
+void WillQAudioProcessorEditor::resized()
 {
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
 
     auto bounds = getLocalBounds();
 
-    auto analyzerEnabledArea = bounds.removeFromTop(25);
-    analyzerEnabledArea.setWidth(100);
-    analyzerEnabledArea.setX(5);
+    
+    auto topArea = bounds.removeFromTop(40);
+
+    auto titleArea = topArea.removeFromLeft(150);
+    titleComponent.setBounds(titleArea);
+    
+    auto analyzerEnabledArea = topArea.removeFromRight(100);
     analyzerEnabledArea.removeFromTop(2);
+    analyzerEnabledArea.removeFromRight(2);
+
+    
 
     analyzerEnabledButton.setBounds(analyzerEnabledArea);
 
@@ -662,7 +682,7 @@ void SimpleEQAudioProcessorEditor::resized()
 }
 
 
-std::vector<juce::Component*> SimpleEQAudioProcessorEditor::getComps()
+std::vector<juce::Component*> WillQAudioProcessorEditor::getComps()
 {
     return
     {
@@ -678,7 +698,10 @@ std::vector<juce::Component*> SimpleEQAudioProcessorEditor::getComps()
         &lowcutBypassButton,
         &highcutBypassButton,
         &peakBypassButton,
-        &analyzerEnabledButton
+        &analyzerEnabledButton,
+
+        &titleComponent
+        
 
     };
 

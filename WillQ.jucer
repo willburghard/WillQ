@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="Drvng2" name="SimpleEQ" projectType="audioplug" useAppConfig="0"
+<JUCERPROJECT id="Drvng2" name="WillQ" projectType="audioplug" useAppConfig="0"
               addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" companyName="World's Museum"
               companyWebsite="willburghard.github.io" companyEmail="willburghard@gmail.com">
-  <MAINGROUP id="NzQHdN" name="SimpleEQ">
+  <MAINGROUP id="NzQHdN" name="WillQ">
     <GROUP id="{5AC6978B-BE3D-A150-9753-F83EEC6A92A1}" name="Source">
       <FILE id="T6E8Jw" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
@@ -34,7 +34,7 @@
   <EXPORTFORMATS>
     <VS2022 targetFolder="Builds/VisualStudio2022">
       <CONFIGURATIONS>
-        <CONFIGURATION isDebug="1" name="Debug" targetName="SimpleEQ" enablePluginBinaryCopyStep="1"/>
+        <CONFIGURATION isDebug="1" name="Debug" targetName="WillQ" enablePluginBinaryCopyStep="1"/>
         <CONFIGURATION isDebug="0" name="Release" targetName="SimpleEQ"/>
       </CONFIGURATIONS>
       <MODULEPATHS>

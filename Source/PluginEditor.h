@@ -138,6 +138,13 @@ struct LookAndFeel : juce::LookAndFeel_V4 {
     
 };
 
+struct TitleComponent : juce::Component {
+    TitleComponent(juce::String& title);
+    void paint(juce::Graphics& g) override;
+private:
+    juce::String title;
+};
+
 struct RotarySliderWithLabels : juce::Slider
 {
     RotarySliderWithLabels(juce::RangedAudioParameter& rap, const std::string& unitSuffix) : juce::Slider(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag, juce::Slider::TextEntryBoxPosition::NoTextBox),
@@ -169,7 +176,7 @@ private:
 };
 
 struct PathProducer {
-    PathProducer(SingleChannelSampleFifo<SimpleEQAudioProcessor::BlockType>& scsf) :
+    PathProducer(SingleChannelSampleFifo<WillQAudioProcessor::BlockType>& scsf) :
         leftChannelFifo(&scsf) {
         leftChannelFFTDataGenerator.changeOrder(FFTOrder::order2048);
         monoBuffer.setSize(1, leftChannelFFTDataGenerator.getFFTSize());
@@ -177,7 +184,7 @@ struct PathProducer {
     void process(juce::Rectangle<float> fftBounds, double sampleRate);
     juce::Path getPath() { return leftChannelFFTPath; }
 private:
-    SingleChannelSampleFifo<SimpleEQAudioProcessor::BlockType>* leftChannelFifo;
+    SingleChannelSampleFifo<WillQAudioProcessor::BlockType>* leftChannelFifo;
 
     juce::AudioBuffer<float> monoBuffer;
 
@@ -191,7 +198,7 @@ private:
 struct ResponseCurveComponent : juce::Component,
     juce::AudioProcessorParameter::Listener,
     juce::Timer {
-    ResponseCurveComponent(SimpleEQAudioProcessor&);
+    ResponseCurveComponent(WillQAudioProcessor&);
     ~ResponseCurveComponent();
 
     void timerCallback() override;
@@ -207,7 +214,7 @@ struct ResponseCurveComponent : juce::Component,
         shouldShowFFTAnalysis = enabled;
     }
 private:
-    SimpleEQAudioProcessor& audioProcessor;
+    WillQAudioProcessor& audioProcessor;
     juce::Atomic<bool> parametersChanged{ false };
 
     MonoChain monoChain;
@@ -225,6 +232,7 @@ private:
     bool shouldShowFFTAnalysis = true;
 
 };
+
 //==============================================================================
 struct PowerButton : juce::ToggleButton{ };
 struct AnalyzerButton : juce::ToggleButton {
@@ -247,23 +255,23 @@ struct AnalyzerButton : juce::ToggleButton {
 };
 /**
 */
-class SimpleEQAudioProcessorEditor : public juce::AudioProcessorEditor
+class WillQAudioProcessorEditor : public juce::AudioProcessorEditor
 {
 public:
-    SimpleEQAudioProcessorEditor (SimpleEQAudioProcessor&);
-    ~SimpleEQAudioProcessorEditor() override;
+    WillQAudioProcessorEditor (WillQAudioProcessor&);
+    ~WillQAudioProcessorEditor() override;
 
     //==============================================================================
     void paint(juce::Graphics&) override;
     void resized() override;
-
+    juce::String pluginTitle = "WILLQ";
 
 private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
 
     //juce::Atomic<bool> parametersChanged{ false };
-    SimpleEQAudioProcessor& audioProcessor;
+    WillQAudioProcessor& audioProcessor;
 
     RotarySliderWithLabels peakFreqSlider,
         peakGainSlider,
@@ -272,6 +280,8 @@ private:
         highCutFreqSlider,
         lowCutSlopeSlider,
         highCutSlopeSlider;
+
+    TitleComponent titleComponent;
 
     ResponseCurveComponent responseCurveComponent;
 
@@ -297,7 +307,6 @@ private:
 
     LookAndFeel lnf;
 
-    //MonoChain monoChain;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SimpleEQAudioProcessorEditor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WillQAudioProcessorEditor)
 };

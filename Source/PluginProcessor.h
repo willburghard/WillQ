@@ -208,12 +208,12 @@ void updateCutFilter(ChainType& leftLowCut, const CoefficientType& cutCoefficien
 //==============================================================================
 /**
 */
-class SimpleEQAudioProcessor  : public juce::AudioProcessor
+class WillQAudioProcessor  : public juce::AudioProcessor
 {
 public:
     //==============================================================================
-    SimpleEQAudioProcessor();
-    ~SimpleEQAudioProcessor() override;
+    WillQAudioProcessor();
+    ~WillQAudioProcessor() override;
 
     //==============================================================================
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
@@ -269,5 +269,5 @@ private:
 
     juce::dsp::Oscillator<float> osc;
     //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SimpleEQAudioProcessor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WillQAudioProcessor)
 };
